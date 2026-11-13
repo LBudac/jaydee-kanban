@@ -4,6 +4,7 @@ import { env } from './config/env.js';
 import { logger } from './config/logger.js';
 import routes from './routes/index.js';
 import { errorHandler } from './middlewares/error.middleware.js';
+import { securityHeaders, apiLimiter, authLimiter } from './middlewares/security.middleware.js';
 
 /**
  * Creates and configures the Express application.
@@ -23,9 +24,12 @@ import { errorHandler } from './middlewares/error.middleware.js';
 export function createApp(): Express {
   const app = express();
 
+  // Sécurité : en-têtes HTTP en premier
+  app.use(securityHeaders);
+
   // Middleware
   app.use(cors({ origin: env.CORS_ORIGIN }));
-  app.use(express.json());
+  app.use(express.json({ limit: '10kb' })); // refuse les corps trop gros (413)
   app.use(express.urlencoded({ extended: true }));
 
   // Request logging
@@ -39,6 +43,10 @@ export function createApp(): Express {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // Limitation du nombre de requêtes (la plus stricte d'abord)
+  app.use('/api/auth', authLimiter);
+  app.use('/api', apiLimiter);
+
   // API routes
   app.use('/api', routes);
 
@@ -47,4 +55,3 @@ export function createApp(): Express {
 
   return app;
 }
-
