@@ -22,7 +22,7 @@ import { logger } from './logger.js';
 export async function connectDB(): Promise<void> {
   try {
     await mongoose.connect(env.MONGODB_URI);
-    logger.info({ uri: env.MONGODB_URI }, '✅ MongoDB connected successfully');
+    logger.info('✅ MongoDB connected successfully');
   } catch (error) {
     logger.error({ error }, '❌ MongoDB connection error');
     throw error;
