@@ -1,6 +1,6 @@
 {
   "name": "visiplus",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Kanban Node.js server with Express and MongoDB",
   "main": "dist/main.js",
   "type": "module",

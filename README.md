@@ -1,112 +1,43 @@
-# Visiplus - Kanban Node.js Server
+# Jaydee Kanban — API
 
-Serveur Express avec MongoDB pour application Kanban.
+API REST de suivi des ordres de fabrication (OF) en Kanban pour l'atelier d'injection
+plastique Jaydee. Node.js 20 · Express 5 · MongoDB · TypeScript.
 
-## Structure du projet
+## Contexte
+Jaydee a développé cette API pour suivre la production et gérer les priorités.
+Ce dépôt la prépare à la mise en production : tests, sécurité, conteneurisation,
+stratégie CI/CD et documentation.
 
-```
-├── src/
-│   ├── main.ts                 # Entrée principale (création du serveur)
-│   ├── server.ts               # Configuration Express
-│   ├── app.ts                  # Exporte Express app (pour tests)
-│   ├── config/
-│   │   ├── env.ts              # Chargement et validation des variables d'environnement
-│   │   ├── db.ts               # Connexion base de données (Mongoose)
-│   │   └── logger.ts           # Logger (Pino)
-│   ├── models/
-│   │   ├── OF.ts               # Modèle Ordre de Fabrication
-│   │   ├── Column.ts           # Modèle Colonne
-│   │   └── User.ts             # Modèle Utilisateur
-│   ├── routes/
-│   │   ├── index.ts            # Regroupe les routes (OF, Columns, Auth)
-│   │   ├── ofs.routes.ts
-│   │   ├── columns.routes.ts
-│   │   └── auth.routes.ts
-│   ├── controllers/
-│   │   ├── ofs.controller.ts   # Appelle les services (move, create, delete)
-│   │   └── columns.controller.ts
-│   └── middlewares/
-│       ├── auth.middleware.ts  # Vérification JWT
-│       ├── error.middleware.ts # Gestion globale des erreurs
-│       └── validate.middleware.ts # Validation Zod
-├── vitest.config.ts
-├── tsconfig.json
-└── package.json
-```
+## Démarrage rapide
+    cp .env.example .env      # puis renseigner JWT_SECRET
+    docker compose up -d --build
+    curl http://localhost:3000/health
+Installation détaillée, tests et mise à jour : DEPLOYMENT_GUIDE.md
 
-## Prérequis
+## Routes principales
+Toutes exigent un JWT (en-tête Authorization: Bearer <jeton>), sauf /health et /api/auth.
+- POST /api/auth/register, POST /api/auth/login
+- GET et POST /api/columns ; GET, PUT et DELETE /api/columns/:id
+- GET et POST /api/ofs ; GET, PUT et DELETE /api/ofs/:id ; PATCH /api/ofs/:id/move
 
-- Node.js (version 18 ou supérieure)
-- MongoDB (local ou Atlas)
-- npm ou yarn
+## Choix techniques
+- Vitest + Supertest : rapides, compatibles TypeScript et modules ES ; Supertest teste
+  l'application sans ouvrir de port.
+- MongoDB en mémoire pour les tests : tests isolés, aucune base à installer.
+- Docker multi-stage : l'image de production ne contient ni TypeScript ni outils de test.
+- Docker Compose : l'API et MongoDB démarrent ensemble, la base n'est pas exposée.
+- GitHub Actions : build et tests à chaque push et pull request.
 
-## Installation
+## Sécurité
+helmet, limitation des requêtes (10 par 15 min sur /api/auth), taille maximale du JSON,
+dépendances mises à jour, aucun secret dans les logs. Détails et limites : NOTE_SECURITE.md
 
-1. Installer les dépendances :
-```bash
-npm install
-```
+## Documents du projet
+- ANALYSE_EXISTANT.md : structure, risques et priorités
+- CI_CD_STRATEGIE.md : pipeline d'intégration et de déploiement
+- NOTE_SECURITE.md : mesures de sécurité et limites
+- DEPLOYMENT_GUIDE.md : installation, exécution, tests, mise à jour
+- docs/captures/ : résultats des tests, limitation des requêtes, conteneurs Docker
 
-2. Créer un fichier `.env` à la racine du projet :
-```env
-NODE_ENV=development
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/visiplus
-JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long
-JWT_EXPIRES_IN=7d
-CORS_ORIGIN=*
-```
-
-3. Démarrer le serveur en mode développement :
-```bash
-npm run dev
-```
-
-## Scripts disponibles
-
-- `npm run dev` - Démarre le serveur en mode développement avec hot reload (tsx watch)
-- `npm run build` - Compile TypeScript en JavaScript
-- `npm start` - Démarre le serveur en production (nécessite `npm run build` d'abord)
-- `npm test` - Lance les tests avec Vitest
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - Créer un compte utilisateur
-- `POST /api/auth/login` - Se connecter
-
-### Columns
-
-- `GET /api/columns` - Lister toutes les colonnes
-- `GET /api/columns/:id` - Obtenir une colonne
-- `POST /api/columns` - Créer une colonne (authentification requise)
-- `PUT /api/columns/:id` - Mettre à jour une colonne (authentification requise)
-- `DELETE /api/columns/:id` - Supprimer une colonne (authentification requise)
-
-### OFs (Ordres de Fabrication)
-
-- `GET /api/ofs` - Lister tous les OFs (optionnel: `?columnId=xxx`)
-- `GET /api/ofs/:id` - Obtenir un OF (authentification requise)
-- `POST /api/ofs` - Créer un OF (authentification requise)
-- `PUT /api/ofs/:id` - Mettre à jour un OF (authentification requise)
-- `PATCH /api/ofs/:id/move` - Déplacer un OF (authentification requise)
-- `DELETE /api/ofs/:id` - Supprimer un OF (authentification requise)
-
-### Health Check
-
-- `GET /health` - Vérifier l'état du serveur
-
-### Exécution des tests
-
-```bash
-# Exécuter tous les tests
-npm test
-
-# Exécuter en mode watch
-npm test -- --watch
-```
-
-Les tests utilisent **MongoDB Memory Server** (une instance MongoDB en mémoire). Aucune installation de MongoDB n'est nécessaire pour exécuter les tests. Voir `tests/README.md` pour plus de détails.
-
-Le serveur utilise TypeScript avec ES modules. En développement, utilisez `tsx` pour le hot reload automatique.
+## Auteur et version
+Laurentiu Budac — version 1.1.0 (novembre 2026)
