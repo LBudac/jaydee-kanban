@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db # les données survivent à l'arrêt du conteneur
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # port de la machine : port du conteneur
+    env_file: .env # JWT_SECRET, CORS_ORIGIN…
+    environment: # prioritaire sur env_file
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongo:27017/jaydee_kanban
+    depends_on:
+      mongo:
+        condition: service_healthy # attend que MongoDB réponde vraiment
+
+volumes:
+  mongo-data:
