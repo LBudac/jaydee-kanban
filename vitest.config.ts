@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
     pool: 'forks',
+    fileParallelism: false, // un fichier de test à la fois : évite les téléchargements de MongoDB simultanés
     // Variables lues par src/config/env.ts au moment de l'import de l'app
     env: {
       NODE_ENV: 'test',
