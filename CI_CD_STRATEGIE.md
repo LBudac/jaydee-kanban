@@ -21,6 +21,7 @@
    puis vérification de GET /health.
 
 ## Extrait du pipeline (GitHub Actions)
+```yaml
 name: CI
 on:
   push:
@@ -36,6 +37,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx vitest run
+```
 
 ## Gestion des secrets
 - Aucun secret dans le code ni dans le YAML : JWT_SECRET, identifiants du registre
