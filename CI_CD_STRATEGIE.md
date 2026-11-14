@@ -3,12 +3,12 @@
 ## Objectifs
 - Automatiser les vérifications : chaque modification est compilée et testée sans
   intervention humaine.
-- Détecter les régressions avant la fusion dans main, pas en production.
+- Détecter les régressions avant la fusion dans master, pas en production.
 - Livrer de façon reproductible : la même image Docker du test à la production.
 
 ## Déclencheurs
 - pull_request : build et tests avant toute fusion ; la fusion est bloquée si ça échoue.
-- push sur main : mêmes vérifications, puis construction de l'image Docker.
+- push sur master : mêmes vérifications, puis construction de l'image Docker.
 - release (publication d'une version) : déploiement en production après approbation.
 
 ## Étapes du pipeline
@@ -25,7 +25,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
 jobs:
   test:
@@ -47,7 +47,7 @@ jobs:
 
 ## Validations avant mise en production
 - Build et tests verts (bloquant).
-- Pull request relue et approuvée (règle de protection de la branche main).
+- Pull request relue et approuvée (règle de protection de la branche master).
 - Aucune vulnérabilité élevée ou critique dans les dépendances.
 - Approbation manuelle de l'environnement production dans GitHub.
 - Après déploiement, /health doit répondre 200 ; sinon, redéploiement de l'image
