@@ -32,7 +32,7 @@ Si l'une des deux variables obligatoires manque, l'application refuse de démarr
 6. **Runtime en fin de vie** : Node 20, imposé par le contexte, n'est plus maintenu depuis le 30 avril 2026.
 
 ## Priorités avant la mise en production
-1. Corriger le build et ajouter `.gitignore` et`.env.example`, conditions minimales pour que l'application démarre.
+1. Corriger le build et ajouter `.gitignore` et `.env.example`, conditions minimales pour que l'application démarre.
 2. Mettre à jour les dépendances vulnérables, car ces failles sont publiques et documentées.
 3. Activer helmet et la limitation de débit, et ne plus écrire l'URI MongoDB dans les logs.
 4. Écrire les tests des routes `columns`, conteneuriser l'application et lancer les tests automatiquement en CI.
